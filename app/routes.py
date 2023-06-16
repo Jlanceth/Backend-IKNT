@@ -18,9 +18,22 @@ from app.responses import (
     WRONG_TOKEN_MESSAGE,
     TOKEN_EXPIRED_MESSAGE
 )
+from flask_login import current_user, login_user
 
+# @app.route('/login', methods=['POST'])
+# def login():
+#     if current_user.is_authenticated:
+#         return redirect(url_for('index'))
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         user = User.query.filter_by(username=form.username.data).first()
+#         if user is None or not user.check_password(form.password.data):
+#             flash('Invalid username or password')
+#             return redirect(url_for('login'))
+#         login_user(user, remember=form.remember_me.data)
+#         return redirect(url_for('index'))
+#     return render_template('login.html', title='Sign In', form=form)
 
-@app.route('/login', methods=['POST'])
 @app.route('/api/login', methods=['POST'])
 def login():
     request_data = request.get_json()
@@ -110,3 +123,38 @@ def is_authed():
 def get_image(filename):
     directory = os.environ.get('IMAGES_STATIC_PATH') or os.path.join(basedir, 'images')
     return send_from_directory(directory, filename)
+#глава 3 -------------------------------------------------------------------------------------------------------------
+
+
+# -*- coding: utf-8 -*-
+from flask import render_template, flash, redirect, url_for
+from app import app
+from app.forms import LoginForm
+
+@app.route('/')
+@app.route('/index')
+def index():
+    user = {'username': 'Эльдар Рязанов'}
+    posts = [
+        {
+            'author': {'username': 'John'},
+            'body': 'Beautiful day in Portland!'
+        },
+        {
+            'author': {'username': 'Susan'},
+            'body': 'The Avengers movie was so cool!'
+        },
+        {
+            'author': {'username': 'Ипполит'},
+            'body': 'Какая гадость эта ваша заливная рыба!!'
+        }
+    ]
+    return render_template('index.html', title='Home', user=user, posts=posts)
+@app.route('/login', methods=['GET', 'POST'])
+def login_():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Login requested for user {}, remember_me={}'.format(
+            form.username.data, form.remember_me.data))
+        return redirect(('/index'))
+    return render_template('login.html', title='Sign In', form=form)

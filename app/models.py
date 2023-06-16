@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
 from datetime import datetime
 from time import time
+from app import login
 
 
 class User(db.Model):
@@ -153,3 +154,7 @@ def exclude_repeats(lst, unique_prop_name):
     lst_props = set([item[unique_prop_name] for item in lst])
     return [list(filter(lambda item: item[unique_prop_name] == prop, lst))[0] \
             for prop in lst_props]
+
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
